@@ -1,0 +1,6 @@
+framework module FMNavBtnsView {
+  umbrella header "FMNavBtnsView-umbrella.h"
+
+  export *
+  module * { export * }
+}
