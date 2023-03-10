@@ -1,22 +1,15 @@
 PODS:
-  - FMNavBtnsView (0.1.0):
-    - Masonry
-  - Masonry (1.1.0)
+  - FMNavBtnsView (0.1.0)
 
 DEPENDENCIES:
   - FMNavBtnsView (from `../`)
-
-SPEC REPOS:
-  trunk:
-    - Masonry
 
 EXTERNAL SOURCES:
   FMNavBtnsView:
     :path: "../"
 
 SPEC CHECKSUMS:
-  FMNavBtnsView: f699885b30e5c51a80d9f25f3969bb97f8b47fa1
-  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  FMNavBtnsView: 86b6e4bdcb3c040a277b1d7e5ccb2b16100cbc40
 
 PODFILE CHECKSUM: 7a9030d6351c52fa211e650535155df172ac0f2e
 

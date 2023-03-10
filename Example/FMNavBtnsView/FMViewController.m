@@ -19,9 +19,13 @@
 {
     [super viewDidLoad];
     
-    FMNavBtnsView *btns = [FMNavBtnsView viewWithBtns:@[@"标签1", @"标签2"] select:1];
+    FMNavBtnsView *btns = [FMNavBtnsView viewWithBtns:@[@"标签1", @"标签2", @"标签2标签2标签2标签2", @"标签2标签2"] select:1];
+    btns.itemMargin = 10;
+    btns.inset = UIEdgeInsetsMake(0, 20, 0, 20);
+    btns.canScroll = YES;
     btns.frame = CGRectMake(0, 100, self.view.frame.size.width, 30);
     [self.view addSubview:btns];
+    [btns reCreateBtns];
     
 	// Do any additional setup after loading the view, typically from a nib.
 }

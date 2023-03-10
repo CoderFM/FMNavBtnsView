@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "FMNavBtnsView.h"
 
 FOUNDATION_EXPORT double FMNavBtnsViewVersionNumber;
 FOUNDATION_EXPORT const unsigned char FMNavBtnsViewVersionString[];

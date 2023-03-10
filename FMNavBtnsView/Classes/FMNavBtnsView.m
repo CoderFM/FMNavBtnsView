@@ -7,7 +7,6 @@
 //
 
 #import "FMNavBtnsView.h"
-#import <Masonry/Masonry.h>
 
 typedef NS_ENUM(NSUInteger, FMNavBtnsLineStyle) {
     ///自动计算大小
@@ -110,19 +109,26 @@ CGRect ConvertFrameProgress(CGRect original, CGRect finalFrame, CGFloat progress
     
     if (self.canScroll) {
         UIScrollView *scrollView = [[UIScrollView alloc] init];
+        scrollView.translatesAutoresizingMaskIntoConstraints = NO;
         scrollView.showsHorizontalScrollIndicator = NO;
         [self addSubview:scrollView];
-        [scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.right.top.bottom.mas_equalTo(0);
-        }];
+        [NSLayoutConstraint activateConstraints:@[
+            [scrollView.topAnchor constraintEqualToAnchor:self.topAnchor],
+            [scrollView.leftAnchor constraintEqualToAnchor:self.leftAnchor],
+            [scrollView.rightAnchor constraintEqualToAnchor:self.rightAnchor],
+            [scrollView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
+        ]];
         self.scrollView = scrollView;
         
         UIView *view = [[UIView alloc] init];
+        view.translatesAutoresizingMaskIntoConstraints = NO;
         [self.scrollView addSubview:view];
-        [view mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.right.top.mas_equalTo(0);
-            make.height.mas_equalTo(self.scrollView.mas_height);
-        }];
+        [NSLayoutConstraint activateConstraints:@[
+            [view.topAnchor constraintEqualToAnchor:scrollView.topAnchor],
+            [view.leftAnchor constraintEqualToAnchor:scrollView.leftAnchor],
+            [view.rightAnchor constraintEqualToAnchor:scrollView.rightAnchor],
+            [view.heightAnchor constraintEqualToAnchor:scrollView.heightAnchor]
+        ]];
         self.scrollContent = view;
     } else {
         
@@ -148,28 +154,22 @@ CGRect ConvertFrameProgress(CGRect original, CGRect finalFrame, CGFloat progress
             self.selected = 0;
         }
         if (self.canScroll) {
-            if (![self.subviews containsObject:self.scrollView]) {
-                [self addSubview:self.scrollView];
-            }
-            [self.scrollView mas_remakeConstraints:^(MASConstraintMaker *make) {
-                make.left.right.top.bottom.mas_equalTo(0);
-            }];
             CGFloat selectMaxX = 0;
             UIButton *left = nil;
             for (int i = 0; i < self.titles.count; i++) {
                 UIButton *btn = [self createBtnIndex:i];
                 [self.scrollContent addSubview:btn];
                 CGFloat width =[self titleWidthWithIndex:i forBtn:btn];
-                [btn mas_makeConstraints:^(MASConstraintMaker *make) {
-                    if (left) {
-                        make.left.mas_equalTo(left.mas_right);
-                    } else {
-                        make.left.mas_equalTo(self.inset.left);
-                    }
-                    make.top.mas_equalTo(self.inset.top);
-                    make.bottom.mas_equalTo(-self.inset.bottom);
-                    make.width.mas_equalTo(width + self.itemMargin);
-                }];
+                NSMutableArray *constraints = [NSMutableArray array];
+                if (left) {
+                    [constraints addObject:[btn.leftAnchor constraintEqualToAnchor:left.rightAnchor]];
+                } else {
+                    [constraints addObject:[btn.leftAnchor constraintEqualToAnchor:self.scrollContent.leftAnchor constant:self.inset.left]];
+                }
+                [constraints addObject:[btn.topAnchor constraintEqualToAnchor:self.scrollContent.topAnchor constant:self.inset.top]];
+                [constraints addObject:[btn.bottomAnchor constraintEqualToAnchor:self.scrollContent.bottomAnchor constant:-self.inset.bottom]];
+                [constraints addObject:[btn.widthAnchor constraintEqualToConstant:width + self.itemMargin]];
+                [NSLayoutConstraint activateConstraints:constraints];
                 left = btn;
                 if (i == self.selected) {
                     self.selectBtn = btn;
@@ -180,9 +180,9 @@ CGRect ConvertFrameProgress(CGRect original, CGRect finalFrame, CGFloat progress
                 [self.btns addObject:btn];
             }
             if (left) {
-                [left mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.right.mas_equalTo(-self.inset.right);
-                }];
+                [NSLayoutConstraint activateConstraints:@[
+                    [left.rightAnchor constraintEqualToAnchor:self.scrollContent.rightAnchor constant:-self.inset.right]
+                ]];
             }
             [self updateLine];
             __weak typeof(self) weakSelf = self;
@@ -198,16 +198,16 @@ CGRect ConvertFrameProgress(CGRect original, CGRect finalFrame, CGFloat progress
             for (int i = 0; i < self.titles.count; i++) {
                 UIButton *btn = [self createBtnIndex:i];
                 [self addSubview:btn];
-                [btn mas_makeConstraints:^(MASConstraintMaker *make) {
-                    if (left) {
-                        make.left.mas_equalTo(left.mas_right);
-                    } else {
-                        make.left.mas_equalTo(self.inset.left);
-                    }
-                    make.top.mas_equalTo(self.inset.top);
-                    make.bottom.mas_equalTo(-self.inset.bottom);
-                    make.width.mas_equalTo(self.mas_width).multipliedBy(multiplied).offset(-margin);
-                }];
+                NSMutableArray *constraints = [NSMutableArray array];
+                if (left) {
+                    [constraints addObject:[btn.leftAnchor constraintEqualToAnchor:left.rightAnchor]];
+                } else {
+                    [constraints addObject:[btn.leftAnchor constraintEqualToAnchor:self.leftAnchor constant:self.inset.left]];
+                }
+                [constraints addObject:[btn.topAnchor constraintEqualToAnchor:self.topAnchor constant:self.inset.top]];
+                [constraints addObject:[btn.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-self.inset.bottom]];
+                [constraints addObject:[btn.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:multiplied constant:-margin]];
+                [NSLayoutConstraint activateConstraints:constraints];
                 left = btn;
                 if (i == self.selected) {
                     self.selectBtn = btn;
@@ -222,6 +222,7 @@ CGRect ConvertFrameProgress(CGRect original, CGRect finalFrame, CGFloat progress
 - (UIButton *)createBtnIndex:(NSInteger)index {
     id title = self.titles[index];
     UIButton *btn = [[UIButton alloc] init];
+    btn.translatesAutoresizingMaskIntoConstraints = NO;
     btn.tag = index;
     if (self.configurationBtn) {
         self.configurationBtn(btn, title, index);
@@ -285,7 +286,7 @@ CGRect ConvertFrameProgress(CGRect original, CGRect finalFrame, CGFloat progress
 
 - (void)layoutSubviews{
     [super layoutSubviews];
-    if (!self.lineLayouted) {
+    if (!self.lineLayouted || self.lineView.center.x == 0) {
         if (self.canScroll) {
             [self.scrollContent layoutIfNeeded];
             if (self.scrollView.contentInset.top > 0) {
